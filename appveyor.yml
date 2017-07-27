@@ -11,8 +11,6 @@ build_script:
     
     $env:NSTORE_LOG_POLLER = "1";    
     
-    sqlcmd -S "(local)\SQL2014,1433" -U sa -P Password12! -Q "CREATE DATABASE NStore" -d "master"
-    
     .\build.ps1
 
 test: off
