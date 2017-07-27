@@ -73,7 +73,7 @@ CREATE DATABASE NStore";
     {
         Provider = "MsSql",
         ConnectionString = msSqlServerConnectionString
-         });
+    });
     
     var env = new Dictionary<string, string>{
         { "NSTORE_MSSQL", msSqlDatabaseConnectionString},
