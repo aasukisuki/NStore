@@ -1,21 +1,21 @@
-#addin "Cake.Docker"
 #addin "Cake.SqlTools"
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
-
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-var msSqlConnectionString = EnvironmentVariable("NSTORE_MSSQL") ?? "Server=localhost,1433;User Id=sa;Password=NStoreD0ck3r";
+
 //////////////////////////////////////////////////////////////////////
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
+var msSqlConnectionString = EnvironmentVariable("NSTORE_MSSQL") ?? "Server=localhost,1433;User Id=sa;Password=NStoreD0ck3r";
+
 private void RunTest(string testProject, IDictionary<string,string> env = null)
 {
     var projectDir = "./src/"+ testProject + "/";
     var settings = new ProcessSettings
     {
-        Arguments = "xunit",
+        Arguments = "xunit -parallel none",
         WorkingDirectory = projectDir,
         EnvironmentVariables = env
     };
