@@ -1,15 +1,29 @@
+#addin "Cake.Docker"
+#addin "Cake.SqlTools"
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-
+var msSqlConnectionString = EnvironmentVariable("NSTORE_MSSQL") ?? "Server=localhost,1433;User Id=sa;Password=NStoreD0ck3r";
 //////////////////////////////////////////////////////////////////////
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
+private void RunTest(string testProject, IDictionary<string,string> env = null)
+{
+    var projectDir = "./src/"+ testProject + "/";
+    var settings = new ProcessSettings
+    {
+        Arguments = "xunit",
+        WorkingDirectory = projectDir,
+        EnvironmentVariables = env
+    };
 
-// Define directories.
+    StartProcess("dotnet", settings);
+}
+
+// Define Settings.
 var artifactsDir    = Directory("./artifacts");
 var solution        = "./src/NStore.sln";
 
@@ -28,7 +42,7 @@ Task("restore-packages")
     .Does(() =>
 {
     DotNetCoreRestore(solution);
-    NuGetRestore(solution);
+   // NuGetRestore(solution);
 });
 
 Task("Build")
@@ -43,17 +57,37 @@ Task("Build")
 	DotNetCoreBuild(solution, settings);
 });
 
-Task("CreateMsSqlDatabase")
+Task("RunMsSqlTests")
+    .IsDependentOn("Build")
     .Does(()=>
 {
+var sql = @"USE master
+IF EXISTS(select * from sys.databases where name='NStore')
+DROP DATABASE NStore
 
+CREATE DATABASE NStore";
+
+    ExecuteSqlQuery(sql, new SqlQuerySettings()
+    {
+        Provider = "MsSql",
+        ConnectionString = msSqlConnectionString
+    });
+    
+    var env = new Dictionary<string, string>{
+        { "NSTORE_MSSQL", msSqlConnectionString },
+    };
+    
+    RunTest("NStore.Persistence.MsSql.Tests",env);
 });
-
 
 Task("RunTests")
     .IsDependentOn("Build")
     .Does(() =>
 {
+    var env = new Dictionary<string, string>{
+        { "NSTORE_MSSQL", msSqlConnectionString },
+    };
+
     var testProjects = new string[] {
         "NStore.Tests", 
         "NStore.Persistence.Tests",  
@@ -64,13 +98,7 @@ Task("RunTests")
 
     foreach(var testProject in testProjects)
 	{
-        var projectDir = "./src/"+ testProject + "/";
-        var settings = new ProcessSettings
-        {
-            Arguments = "xunit",
-            WorkingDirectory = projectDir
-        };
-        StartProcess("dotnet", settings);
+        RunTest(testProject,env);
     }
 });
 
