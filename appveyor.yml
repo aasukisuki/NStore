@@ -9,7 +9,7 @@ build_script:
 
     $env:NSTORE_MSSQL = "Server=(local)\SQL2014,1433;Database=NStore;User ID=sa;Password=Password12!;MultipleActiveResultSets=true";    
     
-    $env:NSTORE-LOG-POLLER = "1";    
+    $env:NSTORE_LOG_POLLER = "1";    
     
     sqlcmd -S "(local)\SQL2014,1433" -U sa -P Password12! -Q "CREATE DATABASE NStore" -d "master"
     

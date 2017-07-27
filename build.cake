@@ -43,6 +43,13 @@ Task("Build")
 	DotNetCoreBuild(solution, settings);
 });
 
+Task("CreateMsSqlDatabase")
+    .Does(()=>
+{
+
+});
+
+
 Task("RunTests")
     .IsDependentOn("Build")
     .Does(() =>
