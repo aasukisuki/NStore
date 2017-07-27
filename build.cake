@@ -1,4 +1,5 @@
 #addin "Cake.SqlTools"
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
@@ -8,7 +9,8 @@ var configuration = Argument("configuration", "Release");
 //////////////////////////////////////////////////////////////////////
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
-var msSqlConnectionString = EnvironmentVariable("NSTORE_MSSQL") ?? "Server=localhost,1433;User Id=sa;Password=NStoreD0ck3r";
+var msSqlServerConnectionString = EnvironmentVariable("NSTORE_MSSQL") ?? "Server=localhost,1433;User Id=sa;Password=NStoreD0ck3r";
+var msSqlDatabaseConnectionString  = msSqlServerConnectionString +";Database=NStore";
 
 private void RunTest(string testProject, IDictionary<string,string> env = null)
 {
@@ -70,11 +72,11 @@ CREATE DATABASE NStore";
     ExecuteSqlQuery(sql, new SqlQuerySettings()
     {
         Provider = "MsSql",
-        ConnectionString = msSqlConnectionString
-    });
+        ConnectionString = msSqlServerConnectionString
+         });
     
     var env = new Dictionary<string, string>{
-        { "NSTORE_MSSQL", msSqlConnectionString },
+        { "NSTORE_MSSQL", msSqlDatabaseConnectionString},
     };
     
     RunTest("NStore.Persistence.MsSql.Tests",env);
@@ -85,7 +87,7 @@ Task("RunTests")
     .Does(() =>
 {
     var env = new Dictionary<string, string>{
-        { "NSTORE_MSSQL", msSqlConnectionString },
+        { "NSTORE_MSSQL", msSqlDatabaseConnectionString},
     };
 
     var testProjects = new string[] {

@@ -7,7 +7,7 @@ shallow_clone: true
 build_script:
 - ps: >- 
 
-    $env:NSTORE_MSSQL = "Server=(local)\SQL2014,1433;Database=NStore;User ID=sa;Password=Password12!;MultipleActiveResultSets=true";    
+    $env:NSTORE_MSSQL = "Server=(local)\SQL2014,1433;User ID=sa;Password=Password12!;MultipleActiveResultSets=true";    
     
     $env:NSTORE_LOG_POLLER = "1";    
     
