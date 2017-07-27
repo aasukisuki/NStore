@@ -6,12 +6,12 @@ services:
 shallow_clone: true
 build_script:
 - ps: >- 
+
+    $env:NSTORE_MSSQL = "Server=(local)\SQL2014,1433;Database=NStore;User ID=sa;Password=Password12!;MultipleActiveResultSets=true";    
     
-    set NSTORE_MSSQL=Server=(local)\SQL2014,1433;Database=NStore;User ID=sa;Password=Password12!;MultipleActiveResultSets=true;Connection Timeout=5
-
-    set NSTORE-LOG-POLLER=1
-
-    sqlcmd -S (local)\SQL2014,1433 -U sa -P Password12! -Q "CREATE DATABASE NStore" -d "master"
+    $env:NSTORE-LOG-POLLER = "1";    
+    
+    sqlcmd -S "(local)\SQL2014,1433" -U sa -P Password12! -Q "CREATE DATABASE NStore" -d "master"
     
     .\build.ps1
 
