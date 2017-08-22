@@ -5,15 +5,19 @@ using NStore.InMemory;
 using NStore.Persistence.Mongo;
 using NStore.Persistence;
 using NStore.Sample.Support;
+using MongoDB.Driver;
+using System.Security.Authentication;
+using System.Collections.Generic;
 
 namespace NStore.Sample
 {
     static class Program
     {
-        private static string Mongo = "mongodb://localhost/NStoreSample";
+        // private static string Mongo = "mongodb://localhost/NStoreSample";
+        private static string Mongo = "mongodb://localhost:C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==@localhost:10255/admin?ssl=true&3t.sslSelfSignedCerts=true";
         private static readonly CommandLineApplication Cmd = new CommandLineApplication(throwOnUnexpectedArg: false);
 
-        private static string _providerName = "memory";
+        private static string _providerName = "mongo";
         private static bool _useSnapshots = true;
         private static bool _quietMode = false;
         private static bool _fastMode = false;
@@ -108,7 +112,18 @@ namespace NStore.Sample
                         Serializer = new MongoCustomSerializer(),
                         CustomizePartitionSettings = settings =>
                         {
-                            settings.MaxConnectionPoolSize = 5000;
+                            settings.Server = new MongoServerAddress("localhost", 10255);
+                            settings.UseSsl = true;
+                            settings.SslSettings = new SslSettings();
+                            settings.SslSettings.EnabledSslProtocols = SslProtocols.Tls12;
+
+                            MongoIdentity identity = new MongoInternalIdentity("NStoreSample", "admin");
+                            MongoIdentityEvidence evidence = new PasswordEvidence("C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==");
+
+                            settings.Credentials = new List<MongoCredential>()
+                            {
+                                new MongoCredential("SCRAM-SHA-1", identity, evidence)
+                            };
                         }
                     };
                     var mongo = new MongoPersistence(options);
